@@ -20,11 +20,13 @@
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.18.2",
+    "cheerio": "^1.0.0-rc.2",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.3",
     "ejs": "^2.5.7",
     "express": "^4.16.2",
     "express-session": "^1.15.6",
+    "fs": "0.0.1-security",
     "method-override": "^2.3.10",
     "mongoose": "^5.0.3",
     "morgan": "^1.9.0",
@@ -32,6 +34,9 @@
     "passport-facebook": "^2.1.1",
     "passport-google-oauth": "^1.0.0",
     "passport-local": "^1.0.0",
-    "passport-twitter": "^1.0.4"
+    "passport-twitter": "^1.0.4",
+    "request": "^2.83.0",
+    "url": "^0.11.0",
+    "url-parse": "^1.2.0"
   }
 }
