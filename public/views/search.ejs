@@ -1,99 +1,112 @@
 <!-- views/search.ejs -->
 <!doctype html>
 <html>
-<head>
-    <title>Product Tracker</title>
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
-
-    <link href="css/main.css" type="text/css" rel="stylesheet">
-    <link href="css/search.css" type="text/css" rel="stylesheet">
-    
-    <script src="/socket.io/socket.io.js"></script>
-
-    <script src="js/search.js"></script>
-
-</head>
-<body>
-<div class="container">
-
-    <div class="page-header text-center">
-        <h1><span class="fa fa-anchor"></span> Product Tracker </h1>
-        <%- include partials/nav.ejs %>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="well">
-                <h3><span class="fa fa-user"></span> Search for products</h3>
-                    <form action="/search" method="post">
-                        <input id="searchcontent" type="text" name="searchcontent" value="<%= search %>">
-                        <input type="submit" value="Search">
-                    </form>
-                    <% if(search == null || search == ''){ %>
-                        <p>As of now, Product Tracker only checks products from materiel.net and boulanger.com.</p>
-                    <% } else { %>
-                        <ul>
-                            <% for (product in results) {%>
-                                <% product = results[product] %>
-                                <li class="searchRes" id="<%= product.sid %>">
-                                    <div class="infobox_header">
-                                        <h4><%= product.title %></h4>
-                                        <div class="infobox_seller_name">Sold by <%= product.seller %></div>
-                                    </div>
-                                    <div class="infobox_wrapper">
-                                        <div class="infobox_image">
-                                            <img src="<%= product.iurl %>" alt="<%= product.ialt %>">
-                                        </div>
-                                        <div class="infobox_info">
-                                            <div class="infobox_text">
-                                                <div class="infobox_desc">
-                                                    <%= product.desc %>
-                                                </div>
-                                                <div class="infobox_price">
-                                                    Price : <%= product.price %> €
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="infobox_controls">
-
-                                        <div class="infobox_source">
-                                            <a href="<%= product.link %>" class="infobox_link">See more on the seller's website</a>
-                                        </div>
-
-                                        <% var iswatched = false %>
-                                        <% for (wp in watched_products) {%>
-                                            <% if(watched_products[wp].sid === product.sid){ %>
-                                                <% iswatched = true %>
-                                            <% } %>
-                                        <% } %>
-
-                                        <% if (iswatched) { %>
-                                            <div class="infobox_remove_button">
-                                                <a href="/removeWatchedProduct?sid=<%= product.sid %>" class="infobox_link">
-                                                    Remove from watchlist
-                                                </a>
-                                            </div>
-                                        <% } else { %>
-                                            <div class="infobox_add_button">
-                                                <a href="/addWatchedProd?sid=<%= product.sid %>" id="button_<%= product.sid %>" class="infobox_watchlist_add_button">
-                                                    Add to watchlist
-                                                </a>
-                                            </div>
-                                        <% } %>
-                                        <div class="infobox_similar_button">
-                                            <a href="/similarProducts?sid=<%= product.sid %>" class="infobox_link">See similar products</a>
-                                        </div>
-                                    </div>
-                                </li>
-                            <% } %>
-                        </ul>
-                    <% } %>
+    <head>
+        <title>Product Tracker</title>
+        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+        <link href="css/main.css" type="text/css" rel="stylesheet">
+        <link href="css/search.css" type="text/css" rel="stylesheet">
+        
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="js/search.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="page-header text-center">
+                <h1><span class="fa fa-anchor"></span> Product Tracker </h1>
+                <%- include partials/nav.ejs %>
             </div>
+            <div class="well text-center">
+                <!--<h3><span class="fa fa-user"></span> Search for products</h3>-->
+                <form class="form-group" action="/search" method="post">
+                    <div id="search-bar" class="form-row">
+                        <input id="searchcontent" class="form-group form-control col-md-8" type="text" name="searchcontent" placeholder="Type your search here..." value="<%= search %>">
+                        <input type="submit" class="submit-search-button form-group col-md-3 btn btn-warning btn-lg" value="Search">
+                    </div>
+                </form>
+            </div>
+            <div class="row search-container">
+                <% if(search == null || search == ''){ %>
+                <p>As of now, Product Tracker only checks products from materiel.net and boulanger.com.</p>
+                <% } else { %>
+
+                <ul class="list-group">
+                    <% for (product in results) {%>
+                    <% product = results[product] %>
+                    <% var iswatched = false %>
+                    <% for (wp in watched_products) {%>
+                    <% if(watched_products[wp].sid === product.sid){ %>
+                    <% iswatched = true %>
+                    <% var current_threshold = watched_products[wp].threshold%>
+                    <% } %>
+                    <% } %>
+                    <% if (iswatched) { %>
+                    <li class="searchRes watched_product_container list-group-item" id="<%= product.sid %>">
+                    <% } else { %>
+                    <li class="searchRes not_watched_product_container list-group-item" id="<%= product.sid %>">
+                    <% } %>
+                        <div class="infobox_header">
+                            <h4>
+                            <% if (iswatched) { %>
+                                <i class="fas fa-star"></i> 
+                            <% } %>
+                            <%= product.title %>
+                            </h4>
+                            <div class="infobox_seller_name"> Sold by <%= product.seller %></div>   
+                        </div>
+                        <div class="infobox_wrapper">
+                            <div class="infobox_image">
+                                <img src="<%= product.iurl %>" alt="<%= product.ialt %>">
+                            </div>
+                            <div class="infobox_info">
+                                <div class="infobox_text">
+                                    <div class="infobox_desc">
+                                        <span class="bold">About : </span><%= product.desc %>
+                                    </div>
+                                    <div class="infobox_price">
+                                        <span class="bold">Price : </span><%= product.price %> €
+                                    </div>
+                                    <% if (iswatched) { %>
+                                    <div class="infobox_threshold">
+                                        <span class="bold">Your threshold : </span><%= current_threshold %> €
+                                    </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="infobox_controls">
+                            <% if (iswatched) { %>
+                            <div class="infobox_details_button">
+                                <a href="/watchedProduct?sid=<%= product.sid %>" class="infobox_link">Edit settings</a>
+                            </div>
+                            <div class="infobox_remove_button">
+                                <a href="/removeWatchedProduct?sid=<%= product.sid %>" class="infobox_link">
+                                    Remove from watchlist
+                                </a>
+                            </div>
+                            <% } else { %>
+                            <div class="infobox_add_button">
+                                <a href="/addWatchedProd?sid=<%= product.sid %>" id="button_<%= product.sid %>" class="infobox_watchlist_add_button">
+                                    Add to watchlist
+                                </a>
+                            </div>
+                            <% } %>
+                            <div class="infobox_similar_button">
+                                <a href="/similarProducts?sid=<%= product.sid %>" class="infobox_link">See similar products</a>
+                            </div>
+                            <div class="infobox_source">
+                                <a href="<%= product.link %>" class="infobox_link">See more on the seller's website</a>
+                            </div>
+                        </div>
+                    </li>
+                    <% } %>
+                </ul>
+
+                <% } %>
+            </div>
+            <%- include partials/footer.ejs %>
         </div>
-    </div>
-</div>
-</body>
+    </body>
 </html>

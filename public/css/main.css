@@ -3,16 +3,56 @@ body{
 	word-wrap:break-word;
 }
 
+.page-header{
+	margin-bottom:20px;
+}
+
 h1{
 	color: #E88317;
 }
 
+.infobox_wrapper{
+	/*display:flex;
+	flex-wrap:wrap;*/
+}
+
+.infobox_info, .infobox_image{
+	margin-top:15px;
+}
+
 .infobox_image{
-    width:100px;
-    height:100px;
+    width:150px;
+    height:150px;
+    border:1px solid black;
+    margin-right:15px;
 }
 
 .infobox_image img{
     width:100%;
     height:100%;
+}
+
+.watched_product_container{
+	background: #FCF8E3;
+	/*background: #ffb454;*/
+	color:#986D3B;
+}
+
+.watched_product_container a{
+	/*color:#8A6D3B;*/
+}
+
+.infobox_seller_name{
+	font-size:small;
+	font-style: italic;
+}
+
+.bold{
+	font-weight: bold;
+}
+
+footer{
+	margin-top:40px;
+	margin-bottom:20px;
+	text-align:center;
 }
