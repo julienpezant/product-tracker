@@ -1,4 +1,4 @@
-<!-- views/search.ejs -->
+<!-- views/watchlist.ejs -->
 <!doctype html>
 <html>
 <head>
@@ -6,13 +6,10 @@
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
-
     <link href="css/main.css" type="text/css" rel="stylesheet">
-    <link href="css/search.css" type="text/css" rel="stylesheet">
+    <link href="css/similarproducts.css" type="text/css" rel="stylesheet">
     
     <script src="/socket.io/socket.io.js"></script>
-
-    <script src="js/search.js"></script>
 
 </head>
 <body>
@@ -26,20 +23,41 @@
     <div class="row">
         <div class="col-sm-6">
             <div class="well">
-                <h3><span class="fa fa-user"></span> Search for products</h3>
-                    <form action="/search" method="post">
-                        <input id="searchcontent" type="text" name="searchcontent" value="<%= search %>">
-                        <input type="submit" value="Search">
-                    </form>
-                    <% if(search == null || search == ''){ %>
-                        <p>As of now, Product Tracker only checks products from materiel.net and boulanger.com.</p>
-                    <% } else { %>
-                        <ul>
+                        <h3>Custom search</h3>
+                        <div class="main_product">
+                            <div class="infobox_header">
+                                <h4><%= sourceprod.title %></h4>
+                                <div class="infobox_seller_name">Sold by <%= sourceprod.seller %></div>
+                            </div>
+                            <div class="infobox_wrapper">
+                                <div class="infobox_image">
+                                    <img src="<%= sourceprod.iurl %>" alt="<%= sourceprod.ialt %>">
+                                </div>
+                                <div class="infobox_info">
+                                    <div class="infobox_text">
+                                        <div class="infobox_desc">
+                                            <%= sourceprod.desc %>
+                                        </div>
+                                        <div class="infobox_price">
+                                            Price : <%= sourceprod.price %> €
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="infobox_controls">
+                                <div class="infobox_source">
+                                    <a href="<%= sourceprod.link %>" class="infobox_link">See more on the seller's website</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4>The following products share some characteristics with the one above.</h4>
+                        <ul class="similar_products">
                             <% for (product in results) {%>
                                 <% product = results[product] %>
                                 <li class="searchRes" id="<%= product.sid %>">
                                     <div class="infobox_header">
-                                        <h4><%= product.title %></h4>
+                                        <h5><%= product.title %></h5>
                                         <div class="infobox_seller_name">Sold by <%= product.seller %></div>
                                     </div>
                                     <div class="infobox_wrapper">
@@ -58,11 +76,9 @@
                                         </div>
                                     </div>
                                     <div class="infobox_controls">
-
                                         <div class="infobox_source">
                                             <a href="<%= product.link %>" class="infobox_link">See more on the seller's website</a>
                                         </div>
-
                                         <% var iswatched = false %>
                                         <% for (wp in watched_products) {%>
                                             <% if(watched_products[wp].sid === product.sid){ %>
@@ -88,9 +104,8 @@
                                         </div>
                                     </div>
                                 </li>
-                            <% } %>
-                        </ul>
-                    <% } %>
+                        <% } %>
+                    </ul>
             </div>
         </div>
     </div>

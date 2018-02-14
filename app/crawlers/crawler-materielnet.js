@@ -37,7 +37,7 @@ module.exports = function(mongoose) {
         function crawl() {
             if(numPagesVisited >= MAX_PAGES_TO_VISIT) {
                 console.log("Reached the last page of materiel.net");
-                saveData();
+                cleanData();
                 return;
             }else{
                 var nextPage = pagesToVisit.pop();
@@ -92,19 +92,6 @@ module.exports = function(mongoose) {
 
                     var sid = "materielnet_" + $(this).attr("data-numkey");
 
-                    /*var element = 
-                    {
-                    "title" : title, 
-                    "description":description,
-                    "img_url": img_url,
-                    "img_alt": img_alt,
-                    "price": price,
-                    "link":link,
-                    "seller":"materiel.net"
-                    }
-
-                    content.push(element);*/
-
                     // Create an instance of Product
                     var product_instance = new Product({ 
                         sid : sid,
@@ -140,15 +127,9 @@ module.exports = function(mongoose) {
         }
 
 
-        function saveData(){
-            console.log("Saving data from materiel.net...");
-            /*var str = JSON.stringify(content, null, 2);
-            fs.writeFile('testfile.txt', str, 'utf8', function(err) {
-                if(err) {
-                    console.log("error saving");
-                    return console.log(err);
-                }
-            });*/
+        function cleanData(){
+            require('../tools/clean-watchlists.js')(mongoose);
+            console.log("Cleaning up collections...");
         }
 
         function cleanText(text){

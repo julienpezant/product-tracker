@@ -35,7 +35,7 @@ module.exports = function(mongoose) {
         function crawl() {
             if(numPagesVisited >= MAX_PAGES_TO_VISIT) {
                 console.log("Reached the last page of boulanger.com");
-                saveData();
+                cleanData();
                 return;
             }else{
                 var nextPage = pagesToVisit.pop();
@@ -107,19 +107,6 @@ module.exports = function(mongoose) {
                       if (err) return handleError(err);
                       // saved!
                     });
-
-                    /*var element = 
-                    {
-                    "title" : title, 
-                    "description":description,
-                    "img_url": img_url,
-                    "img_alt": img_alt,
-                    "price": price,
-                    "link":link,
-                    "seller":"Boulanger"
-                    }
-
-                    content.push(element);*/
                 });
 
                 var basepage = 'https://www.boulanger.com'; 
@@ -138,8 +125,9 @@ module.exports = function(mongoose) {
             });
         }
 
-        function saveData(){
-            console.log("Saving data from boulanger.com");
+        function cleanData(){
+            require('../tools/clean-watchlists.js')(mongoose);
+            console.log("Cleaning up collections...");
         }
 
         function cleanText(text){

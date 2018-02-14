@@ -2,11 +2,12 @@
 <!doctype html>
 <html>
 <head>
-    <title>Project Tracker</title>
+    <title>Product Tracker</title>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
-    <link href="css/productDetails.css" type="text/css" rel="stylesheet">
+    <link href="css/main.css" type="text/css" rel="stylesheet">
+    <link href="css/productdetails.css" type="text/css" rel="stylesheet">
     
     <script src="/socket.io/socket.io.js"></script>
 
@@ -16,7 +17,7 @@
 
     <div class="page-header text-center">
         <h1><span class="fa fa-anchor"></span> Product Tracker </h1>
-        <a href="/logout" class="btn btn-default btn-sm">Logout</a>
+        <%- include partials/nav.ejs %>
     </div>
 
     <div class="row">
@@ -38,9 +39,18 @@
                                 <div class="infobox_price">
                                     Current price : <%= product.price %> €
                                 </div>
-                                <div class="infobox_source">
-                                    <a href="<%= product.link %>" class="infobox_link">See more on the seller's website</a>
+                                <div class="infobox_current_threshold">
+                                    Your current price threshold for this product is <%= threshold %> €.
                                 </div>
+                                <% if(notifications === 'enabled'){ %>
+                                    <div class="infobox_notif_status">
+                                        Notifications for this product are enabled.
+                                    </div>
+                                <% } else { %>
+                                    <div class="infobox_notif_status">
+                                        Notifications for this product are disabled.
+                                    </div>
+                                <% } %>
                             </div>
 
                             <form action="/editWatchedProduct?sid=<%= product.sid %>" method="post">
@@ -68,8 +78,14 @@
                         </div>
                     </div>
                     <div class="infobox_controls">
+                        <div class="infobox_source">
+                            <a href="<%= product.link %>" class="infobox_link">See more on the seller's website</a>
+                        </div>
                         <div class="infobox_similar_button">
-                            See similar products
+                            <a href="/similarProducts?sid=<%= product.sid %>" class="infobox_link">See similar products</a>
+                        </div>
+                        <div class="infobox_remove_button">
+                            <a href="/removeWatchedProduct?sid=<%= product.sid %>" class="infobox_link">Remove from watchlist</a>
                         </div>
                     </div>
             </div>

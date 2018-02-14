@@ -1,0 +1,45 @@
+.home-button-wrapper{
+	margin-top:120px;
+}
+
+.home-search .home-icon, .home-watchlist .home-icon{
+	font-size:200px;
+	text-align:center;
+	margin-top:40px;
+	margin-bottom:10px;
+}
+
+.home-search .icon-legend{
+	color:white;
+	font-weight: bold;
+}
+
+.home-watchlist .icon-legend{
+	color: #E88317;
+	font-weight: bold;
+}
+
+.home-search, .home-watchlist{
+	min-width:300px;
+	min-height:300px;
+	border-radius: 45px;
+	display:inline-block;
+	transition: transform .5s;
+}
+
+.home-search:hover, .home-watchlist:hover{
+	-ms-transform: scale(1.1); /* IE 9 */
+    -webkit-transform: scale(1.1); /* Safari 3-8 */
+    transform: scale(1.1); 
+}
+
+.home-search{
+	background: #E88317;
+	color:white;
+
+}
+
+.home-watchlist{
+	border: 13px solid #E88317;
+	color: #E88317;
+}

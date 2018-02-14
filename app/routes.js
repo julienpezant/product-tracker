@@ -9,7 +9,12 @@ module.exports = function(app, passport, mongoose) {
     // HOME PAGE (with login links) ========
     // =====================================
     app.get('/', function(req, res) {
-        res.render('index.ejs'); // load the index.ejs file
+
+        if(isLoggedInBool(req, res)){
+            res.redirect('/profile');
+        }else{
+            res.render('index.ejs'); // load the index.ejs file
+        }
     });
 
     // =====================================
@@ -18,8 +23,12 @@ module.exports = function(app, passport, mongoose) {
     // show the login form
     app.get('/login', function(req, res) {
 
-        // render the page and pass in any flash data if it exists
-        res.render('login.ejs', { message: req.flash('loginMessage') }); 
+        if(isLoggedInBool(req, res)){
+            res.redirect('/profile');
+        }else{
+            // render the page and pass in any flash data if it exists
+            res.render('login.ejs', { message: req.flash('loginMessage') }); 
+        }
     });
 
     // process the login form
@@ -35,8 +44,12 @@ module.exports = function(app, passport, mongoose) {
     // show the signup form
     app.get('/signup', function(req, res) {
 
-        // render the page and pass in any flash data if it exists
-        res.render('signup.ejs', { message: req.flash('signupMessage') });
+        if(isLoggedInBool(req, res)){
+            res.redirect('/profile');
+        }else{
+            // render the page and pass in any flash data if it exists
+            res.render('signup.ejs', { message: req.flash('signupMessage') });
+        }
     });
 
     // process the signup form
@@ -45,6 +58,7 @@ module.exports = function(app, passport, mongoose) {
         failureRedirect : '/signup', // redirect back to the signup page if there is an error
         failureFlash : true // allow flash messages
     }));
+
 
     // =====================================
     // PROFILE SECTION =====================
@@ -55,32 +69,97 @@ module.exports = function(app, passport, mongoose) {
         });
     });
 
+
     // =====================================
     // SEARCH SECTION =====================
     // =====================================
     app.all('/search', isLoggedIn, function(req, res) {
         var str = req.body.searchcontent;
-        Product.find({}, function(err, products){
-            if(err){
-                console.log(err);
-                res.render('search.ejs', {
-                    user : req.user, // get the user out of session and pass to template
-                    search : req.body.searchcontent,
-                    results : null
-                });
-            } else{
-                results = products;
-                index = createProductIndex(products);
-                indexed_results = searchProductsFromIndex(str, index, products);
-                res.render('search.ejs', {
-                    user : req.user, // get the user out of session and pass to template
-                    search : req.body.searchcontent,
-                    results : indexed_results
-                });
-            }
-        })
+        var regex = RegExp('^\ *$');
+        if(regex.test(str)){
+            res.render('search.ejs', {
+                user : req.user, // get the user out of session and pass to template
+                search : '',
+                results : null,
+                watched_products: null
+            });
+        }else{
+            Product.find({}, function(err, products){
+                if(err){
+                    console.log(err);
+                    res.render('search.ejs', {
+                        user : req.user, // get the user out of session and pass to template
+                        search : req.body.searchcontent,
+                        results : null,
+                        watched_products: null
+                    });
+                } else{
+                    results = products;
+                    indexed_results = searchProductsFromIndex(str, products);
+                    WatchedProduct.find({}, function(err, watched_products){
+                        if(err){
+                            console.log(err);
+                            res.render('search.ejs', {
+                                user : req.user, // get the user out of session and pass to template
+                                search : req.body.searchcontent,
+                                results : null,
+                                watched_products: null
+                            });
+                        } else {
+                            res.render('search.ejs', {
+                                user : req.user, // get the user out of session and pass to template
+                                search : req.body.searchcontent,
+                                results : indexed_results,
+                                watched_products : watched_products
+                            });
+                        }
+                    });
+                }
+            });
+        }
     });
 
+
+    // =====================================
+    // SIMILAR PRODUCTS SECTION ============
+    // =====================================
+    app.get('/similarProducts', isLoggedIn, function(req,res) {
+        var sid = req.query.sid;
+        Product.findOne({'sid':sid}, function(err, mainproduct){
+            if(err){
+                console.log('Could not query product');
+            } else {
+                Product.find({}, function(err, products){
+                    if(err){
+                        console.log(err);
+                    } else{
+                        results = products;
+                        indexed_results = searchSimilarProducts(mainproduct, products);
+                        WatchedProduct.find({}, function(err, watched_products){
+                            if(err){
+                                console.log(err);
+                                res.render('profile.ejs', {
+                                    user : req.user, // get the user out of session and pass to template
+                                });
+                            } else {
+                                res.render('similarproducts.ejs', {
+                                    user : req.user, // get the user out of session and pass to template
+                                    sourceprod : mainproduct,
+                                    results : indexed_results,
+                                    watched_products : watched_products
+                                });
+                            }
+                        });
+                    }
+                })
+            }
+        });
+    });
+
+
+    // =====================================
+    // ADD NEW WATCHED PRODUCT ============
+    // =====================================
     app.get('/addWatchedProd', isLoggedIn, function(req, res) {
         var email = req.user.local.email;
         var sid = req.query.sid;
@@ -88,7 +167,7 @@ module.exports = function(app, passport, mongoose) {
         var watched_product_instance = new WatchedProduct({ 
             umail : email,
             sid : sid,
-            threshold : "-1",
+            threshold : "1000",
             notifications : "disabled"
         });
 
@@ -100,6 +179,10 @@ module.exports = function(app, passport, mongoose) {
         }); 
     });
 
+
+    // =====================================
+    // EDIT WATCHED PRODUCT DATA ===========
+    // =====================================
     app.all('/editWatchedProduct', isLoggedIn, function(req, res) {
         var email = req.user.local.email;
         var sid = req.query.sid;
@@ -125,6 +208,25 @@ module.exports = function(app, passport, mongoose) {
         });
     });
 
+
+    // =====================================
+    // REMOVE WATCHED PRODUCT ==============
+    // =====================================
+    app.get('/removeWatchedProduct', isLoggedIn, function(req, res){
+        var email = req.user.local.email;
+        var sid = req.query.sid;
+        WatchedProduct.findOneAndRemove({'sid':sid, 'umail':email}, function(err){
+            if(err){
+                console.log('Could not query watched product');
+            } 
+            res.redirect('/watchlist');
+        });
+    });
+
+
+    // =====================================
+    // WATCHED PRODUCT SECTION =============
+    // =====================================
     app.all('/watchedProduct', isLoggedIn, function(req, res) {
         var email = req.user.local.email;
         var sid = req.query.sid;
@@ -170,6 +272,10 @@ module.exports = function(app, passport, mongoose) {
         });
     });
 
+
+    // =====================================
+    // WATCHLIST SECTION ===================
+    // =====================================
     app.get('/watchlist', isLoggedIn, function(req,res) {
         var email = req.user.local.email;
         var results = [];
@@ -192,13 +298,14 @@ module.exports = function(app, passport, mongoose) {
                             product = products[product];
                             for(wprod in watchedproducts){
                                 wprod = watchedproducts[wprod];
-                                console.log(product);
                                 if(product.sid === wprod.sid){
                                     results.push(product);
                                 }
                             }
                         }
-
+                        if(results.length === 0){
+                            console.log('no watchlist');
+                        }
                         res.render('watchlist.ejs', {
                             user : req.user, // get the user out of session and pass to template
                             results : results
@@ -209,6 +316,7 @@ module.exports = function(app, passport, mongoose) {
         });
     });
 
+
     // =====================================
     // LOGOUT ==============================
     // =====================================
@@ -216,17 +324,32 @@ module.exports = function(app, passport, mongoose) {
         req.logout();
         res.redirect('/');
     });
+
+    // =====================================
+    // ERROR ===============================
+    // =====================================
+    app.get('*', function(req, res){
+        res.render('error404.ejs');
+    });
+
 };
 
-// route middleware to make sure a user is logged in
+// route middleware to check user login
 function isLoggedIn(req, res, next) {
 
     // if user is authenticated in the session, carry on 
     if (req.isAuthenticated())
         return next();
 
-    // if they aren't redirect them to the home page
+    // if they aren't, redirect them to the home page
     res.redirect('/');
+}
+
+function isLoggedInBool(req, res){
+    if (req.isAuthenticated()){
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -267,8 +390,9 @@ function createProductIndex(data){
     return index;
 }
 
-function searchProductsFromIndex(searchString, index, data){
+function searchProductsFromIndex(searchString, data){
 
+    index = createProductIndex(data);
     // expand = true increases the overall recall
     var res = index.search(searchString,
         {
@@ -287,6 +411,46 @@ function searchProductsFromIndex(searchString, index, data){
         var doc = findDocument(doc.ref, data);
         if(doc != null){
             content.push(doc);
+        }
+    }
+
+    // return the retrieved results
+    if(content.length > 0){
+        return content;
+    }else{
+        return null;
+    }
+}
+
+function searchSimilarProducts(mainproduct, data){
+    index = createProductIndex(data);
+    var terms = mainproduct.title + " " + mainproduct.desc;
+
+    //removing generic terms
+    terms = terms.replace(/ordinateur|pc|portable/gi,'');
+
+    var res = index.search(terms,
+        {
+            fields: {
+                title : {boost : 3},
+                desc : {boost : 1}
+            },
+            bool: "OR",
+            expand: true
+        });
+
+    var content = [];
+
+    var c = 0;
+    for(doc of res){
+        var doc = findDocument(doc.ref, data);
+        if(c < 20){
+            if(doc != null){
+                if(doc.sid != mainproduct.sid){
+                    content.push(doc);
+                    c++;
+                }
+            }
         }
     }
 

@@ -2,10 +2,11 @@
 <!doctype html>
 <html>
 <head>
-    <title>Project Tracker</title>
+    <title>Product Tracker</title>
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+    <link href="css/main.css" type="text/css" rel="stylesheet">
     <link href="css/watchlist.css" type="text/css" rel="stylesheet">
     
     <script src="/socket.io/socket.io.js"></script>
@@ -16,7 +17,7 @@
 
     <div class="page-header text-center">
         <h1><span class="fa fa-anchor"></span> Product Tracker </h1>
-        <a href="/logout" class="btn btn-default btn-sm">Logout</a>
+        <%- include partials/nav.ejs %>
     </div>
 
     <div class="row">
@@ -24,37 +25,47 @@
             <div class="well">
                         <h3>My Watchlist</h3>
                         <ul class="watchlist">
-                            <% for (product in results) {%>
-                                <% product = results[product] %>
-                                <li class="searchRes" id="<%= product.sid %>">
-                                    <div class="infobox_header">
-                                    <h4><%= product.title %></h4>
-                                    <div class="infobox_seller_name">Sold by <%= product.seller %></div>
-                                </div>
-                                <div class="infobox_wrapper">
-                                    <div class="infobox_image">
-                                        <img src="<%= product.iurl %>" alt="<%= product.ialt %>">
+                            <% if (results.length === 0){ %>
+                                <p>Your watchlist is currently empty. <a href="/search">Browse the product list here and add some.</a></p>
+                            <% } else { %>
+                                <% for (product in results) {%>
+                                    <% product = results[product] %>
+                                    <li class="searchRes" id="<%= product.sid %>">
+                                        <div class="infobox_header">
+                                        <h4><%= product.title %></h4>
+                                        <div class="infobox_seller_name">Sold by <%= product.seller %></div>
                                     </div>
-                                    <div class="infobox_info">
-                                        <div class="infobox_text">
-                                            <div class="infobox_desc">
-                                                <%= product.desc %>
-                                            </div>
-                                            <div class="infobox_price">
-                                                Price : <%= product.price %> €
+                                    <div class="infobox_wrapper">
+                                        <div class="infobox_image">
+                                            <img src="<%= product.iurl %>" alt="<%= product.ialt %>">
+                                        </div>
+                                        <div class="infobox_info">
+                                            <div class="infobox_text">
+                                                <div class="infobox_desc">
+                                                    <%= product.desc %>
+                                                </div>
+                                                <div class="infobox_price">
+                                                    Price : <%= product.price %> €
+                                                </div>
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="infobox_controls">
                                         <div class="infobox_source">
                                             <a href="<%= product.link %>" class="infobox_link">See more on the seller's website</a>
                                         </div>
+                                        <div class="infobox_details_button">
+                                            <a href="/watchedProduct?sid=<%= product.sid %>" class="infobox_link">See more details</a>
+                                        </div>
+                                        <div class="infobox_similar_button">
+                                            <a href="/similarProducts?sid=<%= product.sid %>" class="infobox_link">See similar products</a>
+                                        </div>
+                                        <div class="infobox_remove_button">
+                                            <a href="/removeWatchedProduct?sid=<%= product.sid %>" class="infobox_link">Remove from watchlist</a>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="infobox_controls">
-                                    <div class="infobox_details_button">
-                                        <a href="/watchedProduct?sid=<%= product.sid %>" class="infobox_link">See more details</a>
-                                    </div>
-                                </div>
-                            </li>
+                                </li>
+                            <% } %>
                         <% } %>
                     </ul>
             </div>

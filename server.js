@@ -56,25 +56,6 @@ require('./app/routes.js')(app, passport, mongoose); // load the routes
 // cron jobs ===================================================================
 require('./app/cron-jobs.js')(cron, mongoose);
 
-// launch ======================================================================
-/*app.listen(port, function(){
-	console.log('Product Tracker is up on port ' + port);
-});*/
-
-// client connection
-/*io.on('connection', function(socket) {
-	//add to watchlist
-	socket.on('ATWL', function (atwl){
-		Product.findOne({'sid':atwl[0]}, function(err, product){
-            if(err){
-                console.log('Could not add product to watchlist');
-            } else{
-                console.log(product);
-            }
-        })
-	});
-});*/
-
 server.listen(port, function(){
 	console.log('Product Tracker is up on port ' + port);
 });

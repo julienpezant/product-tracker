@@ -2,42 +2,35 @@
 <!doctype html>
 <html>
 <head>
-    <title>Node Authentication</title>
+    <title>Product Tracker</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+    <link href="css/main.css" type="text/css" rel="stylesheet">
+    <link href="css/profile.css" type="text/css" rel="stylesheet">
     <style>
-        body        { padding-top:80px; word-wrap:break-word; }
+        /*body        { padding-top:80px; word-wrap:break-word; }*/
     </style>
 </head>
 <body>
 <div class="container">
-
-    <div class="page-header text-center">
+    <div class="container-fluid text-center">
+    <div class="page-header ">
         <h1><span class="fa fa-anchor"></span> Product Tracker </h1>
-        <a href="/logout" class="btn btn-default btn-sm">Logout</a>
+        <%- include partials/nav.ejs %>
     </div>
-
-    <div class="row">
-
-        <!-- LOCAL INFORMATION -->
-        <div class="col-sm-6">
-            <div class="well">
-                <h3><span class="fa fa-user"></span> Welcome to Product Tracker, <%= user.local.email %></h3>
-
-                    <!-- <p>
-                        <strong>id</strong>: <%= user._id %><br>
-                        <strong>email</strong>: <%= user.local.email %><br>
-                        <strong>password</strong>: <%= user.local.password %>
-                    </p> -->
-
-                    <p><a href="/search">Search for products</a></p>
-                    <p><a href="/watchlist">Watchlist</a></p>
-                    <p>Options</p>
-
-            </div>
+    <div class="row home-button-wrapper">
+        <div class="col">
+            <a href="/search">
+                <div class="home-search"><span class="home-icon fa fa-search"></span><br><span class="icon-legend">ALL PRODUCTS</span></div>
+            </a>
         </div>
-
+        <div class="col">
+            <a href="/watchlist">
+                <div class="home-watchlist"><span class="home-icon fa fa-book"></span><br><span class="icon-legend">MY WATCHLIST</span></div>
+            </a>
+        </div>
     </div>
+</div>
 
 </div>
 </body>
