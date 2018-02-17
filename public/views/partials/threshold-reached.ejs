@@ -1,0 +1,5 @@
+<% if(parseFloat(current_threshold) >= parseFloat(product.price)){%>
+	<div class="valid threshold-reached"><a href="<%= product.link %>" target="_blank">Threshold reached.</a></div>
+<% }else{ %>
+	<div class="wrong threshold-not-reached">Threshold not reached.</div>
+<% } %>

@@ -1,0 +1,48 @@
+<li class="col-md-4 searchRes watched_product_container list-group-item" id="<%= product.sid %>">
+	<div class="infobox_header">
+		<h4><i class="rotating fas fa-star"></i>
+		<%= product.title %>
+		</h4>
+		<div class="infobox_seller_name"> Sold by <%= product.seller %></div>
+	</div>
+	<div class="infobox_wrapper">
+		<div class="infobox_image">
+			<img src="<%= product.iurl %>" alt="<%= product.ialt %>">
+		</div>
+		<hr>
+		<div class="infobox_info">
+			<div class="infobox_text">
+				<div class="infobox_desc">
+					<span class="bold">About : </span><%= product.desc %>
+				</div>
+				<div class="infobox_price">
+					<span class="bold">Price : </span><%= product.price %> €
+				</div>
+				<div class="infobox_threshold">
+					<span class="bold">Your threshold : </span><%= current_threshold %> €
+				</div>
+
+				<%- include threshold-reached.ejs %>
+
+			</div>
+		</div>
+	</div>
+	<hr>
+	<div class="infobox_controls">
+		<div class="infobox_details_button">
+			<a href="/watchedProduct?sid=<%= product.sid %>" class="infobox_link">Edit settings</a>
+		</div>
+		<div class="infobox_remove_button">
+			<a href="/removeWatchedProduct?sid=<%= product.sid %>" class="infobox_link">
+				Remove from watchlist
+			</a>
+		</div>
+		
+		<div class="infobox_similar_button">
+			<a href="/similarProducts?sid=<%= product.sid %>" class="infobox_link">See similar products</a>
+		</div>
+		<div class="infobox_source">
+			<a href="<%= product.link %>" target="_blank" class="infobox_link">Visit website</a>
+		</div>
+	</div>
+</li>

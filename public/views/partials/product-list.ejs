@@ -1,0 +1,18 @@
+<ul class="row list-group">
+    <% for (product in results) {%>
+        <% product = results[product] %>
+        <% var iswatched = false %>
+        <% for (wp in watched_products) {%>
+            <% if(watched_products[wp].sid === product.sid){ %>
+                <% iswatched = true %>
+                <% var current_threshold = watched_products[wp].threshold%>
+            <% } %>
+        <% } %>
+        <% if (iswatched){ %>
+            <%- include watched-infobox.ejs %>
+        <% } else { %>
+            <%- include infobox.ejs %>
+        <% } %>
+        
+    <% } %>
+</ul>

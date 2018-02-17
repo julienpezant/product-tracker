@@ -1,7 +1,8 @@
 // app/routes.js
 var Product = require('./models/product');
 var WatchedProduct = require('./models/watchedproduct');
-var elasticlunr = require('elasticlunr');
+var indexer = require('./tools/index-results');
+var validator = require('./tools/validator');
 
 module.exports = function(app, passport, mongoose) {
 
@@ -11,7 +12,7 @@ module.exports = function(app, passport, mongoose) {
     app.get('/', function(req, res) {
 
         if(isLoggedInBool(req, res)){
-            res.redirect('/profile');
+            res.redirect('/home');
         }else{
             res.render('index.ejs'); // load the index.ejs file
         }
@@ -24,7 +25,7 @@ module.exports = function(app, passport, mongoose) {
     app.get('/login', function(req, res) {
 
         if(isLoggedInBool(req, res)){
-            res.redirect('/profile');
+            res.redirect('/home');
         }else{
             // render the page and pass in any flash data if it exists
             res.render('login.ejs', { message: req.flash('loginMessage') }); 
@@ -33,7 +34,7 @@ module.exports = function(app, passport, mongoose) {
 
     // process the login form
     app.post('/login', passport.authenticate('local-login', {
-        successRedirect : '/profile', // redirect to the secure profile section
+        successRedirect : '/home', // redirect to the secure home section
         failureRedirect : '/login', // redirect back to the signup page if there is an error
         failureFlash : true // allow flash messages
     }));
@@ -45,7 +46,7 @@ module.exports = function(app, passport, mongoose) {
     app.get('/signup', function(req, res) {
 
         if(isLoggedInBool(req, res)){
-            res.redirect('/profile');
+            res.redirect('/home');
         }else{
             // render the page and pass in any flash data if it exists
             res.render('signup.ejs', { message: req.flash('signupMessage') });
@@ -54,7 +55,7 @@ module.exports = function(app, passport, mongoose) {
 
     // process the signup form
     app.post('/signup', passport.authenticate('local-signup', {
-        successRedirect : '/profile', // redirect to the secure profile section
+        successRedirect : '/home', // redirect to the secure home section
         failureRedirect : '/signup', // redirect back to the signup page if there is an error
         failureFlash : true // allow flash messages
     }));
@@ -63,8 +64,8 @@ module.exports = function(app, passport, mongoose) {
     // =====================================
     // PROFILE SECTION =====================
     // =====================================
-    app.get('/profile', isLoggedIn, function(req, res) {
-        res.render('profile.ejs', {
+    app.get('/home', isLoggedIn, function(req, res) {
+        res.render('home.ejs', {
             user : req.user // get the user out of session and pass to template
         });
     });
@@ -95,7 +96,7 @@ module.exports = function(app, passport, mongoose) {
                     });
                 } else{
                     results = products;
-                    indexed_results = searchProductsFromIndex(str, products);
+                    indexed_results = indexer.searchProductsFromIndex(str, products);
                     WatchedProduct.find({}, function(err, watched_products){
                         if(err){
                             console.log(err);
@@ -134,11 +135,11 @@ module.exports = function(app, passport, mongoose) {
                         console.log(err);
                     } else{
                         results = products;
-                        indexed_results = searchSimilarProducts(mainproduct, products);
+                        indexed_results = indexer.searchSimilarProducts(mainproduct, products);
                         WatchedProduct.find({}, function(err, watched_products){
                             if(err){
                                 console.log(err);
-                                res.render('profile.ejs', {
+                                res.render('home.ejs', {
                                     user : req.user, // get the user out of session and pass to template
                                 });
                             } else {
@@ -188,7 +189,7 @@ module.exports = function(app, passport, mongoose) {
         var sid = req.query.sid;
         var error_msg = null;
         var threshold = req.body.threshold;
-        if(!validateNumber(threshold)){
+        if(!validator.validateNumber(threshold)){
             res.redirect('/watchedProduct?sid='+sid+"&formMsg=numerror");
             return;
         }
@@ -232,9 +233,9 @@ module.exports = function(app, passport, mongoose) {
         var sid = req.query.sid;
         var msg = req.query.formMsg;
         if(msg === 'numerror'){
-            msg = "Invalid threshold. Please enter a valid number. (30, 250.99, etc...)";
+            msg = "invalid_num";
         }else if(msg === 'updated'){
-            msg = "Successfully updated settings";
+            msg = "valid_num";
         }
         WatchedProduct.findOne({'sid':sid, 'umail':email}, function(err, watchedproduct){
             if(err){
@@ -252,7 +253,6 @@ module.exports = function(app, passport, mongoose) {
                             product : null
                         });
                     } else {
-                        console.log("query successful");
                         for(product in products){
                             product = products[product];
                             if(product.sid === sid){
@@ -263,7 +263,6 @@ module.exports = function(app, passport, mongoose) {
                                     notifications : watchedproduct.notifications,
                                     msg : msg
                                 });
-                                // localhost:8080/watchedProduct?sid=boulanger_product_1260482
                             }
                         }
                     }
@@ -282,7 +281,7 @@ module.exports = function(app, passport, mongoose) {
         WatchedProduct.find({'umail':email}, function(err, watchedproducts){
             if(err){
                 console.log('Could not query watched products');
-                res.render('profile.ejs', {
+                res.render('home.ejs', {
                     user : req.user, // get the user out of session and pass to template
                 });
             } else {
@@ -290,7 +289,7 @@ module.exports = function(app, passport, mongoose) {
                 Product.find({}, function(err2, products){
                     if(err2){
                         console.log('Could not query products');
-                        res.render('profile.ejs', {
+                        res.render('home.ejs', {
                             user : req.user, // get the user out of session and pass to template
                         });
                     } else {
@@ -303,12 +302,10 @@ module.exports = function(app, passport, mongoose) {
                                 }
                             }
                         }
-                        if(results.length === 0){
-                            console.log('no watchlist');
-                        }
                         res.render('watchlist.ejs', {
                             user : req.user, // get the user out of session and pass to template
-                            results : results
+                            results : results,
+                            watched_products : watchedproducts
                         });
                     }
                 });
@@ -345,134 +342,10 @@ function isLoggedIn(req, res, next) {
     res.redirect('/');
 }
 
+//checks user login (not a middleware)
 function isLoggedInBool(req, res){
     if (req.isAuthenticated()){
         return true;
     }
     return false;
-}
-
-/**
- * Uses a response from mongoose to generate an elasctilunr index for products
- */
-function createProductIndex(data){
-
-    // create our elasticlunr index
-    var index = elasticlunr(function () {
-        this.addField('sid');
-        this.addField('title');
-        this.addField('desc');
-        this.addField('iurl');
-        this.addField('ialt');
-        this.addField('price');
-        this.addField('link');
-        this.addField('seller');
-        this.setRef('sid')
-    });
-
-    // insert data into the index
-    for(product of data){
-
-        var newProduct = {
-            "sid": product.sid,
-            "title": product.title,
-            "desc": product.desc,
-            "iurl": product.iurl,
-            "ialt":  product.ialt,
-            "price":  product.price,
-            "link": product.link,
-            "seller": product.seller
-        };
-
-        index.addDoc(newProduct);
-    }
-
-    return index;
-}
-
-function searchProductsFromIndex(searchString, data){
-
-    index = createProductIndex(data);
-    // expand = true increases the overall recall
-    var res = index.search(searchString,
-        {
-            fields: {
-                title : {boost : 10},
-                desc : {boost : 3},
-                seller : {boost : 3}
-            },
-            bool: "OR",
-            expand: true
-        });
-
-    var content = [];
-
-    for(doc of res){
-        var doc = findDocument(doc.ref, data);
-        if(doc != null){
-            content.push(doc);
-        }
-    }
-
-    // return the retrieved results
-    if(content.length > 0){
-        return content;
-    }else{
-        return null;
-    }
-}
-
-function searchSimilarProducts(mainproduct, data){
-    index = createProductIndex(data);
-    var terms = mainproduct.title + " " + mainproduct.desc;
-
-    //removing generic terms
-    terms = terms.replace(/ordinateur|pc|portable/gi,'');
-
-    var res = index.search(terms,
-        {
-            fields: {
-                title : {boost : 3},
-                desc : {boost : 1}
-            },
-            bool: "OR",
-            expand: true
-        });
-
-    var content = [];
-
-    var c = 0;
-    for(doc of res){
-        var doc = findDocument(doc.ref, data);
-        if(c < 20){
-            if(doc != null){
-                if(doc.sid != mainproduct.sid){
-                    content.push(doc);
-                    c++;
-                }
-            }
-        }
-    }
-
-    // return the retrieved results
-    if(content.length > 0){
-        return content;
-    }else{
-        return null;
-    }
-}
-
-function findDocument(reference, data){
-    for(product of data){
-        if(product.sid == reference){
-            return product;
-        }
-    }
-    return null;
-}
-
-function validateNumber(number){
-    var regex = RegExp('^[0-9]+\.[0-9]{2}$|^[0-9]+$');
-    number = number.replace(",",".");
-    return regex.test(number);
 }

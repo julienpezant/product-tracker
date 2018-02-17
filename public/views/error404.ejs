@@ -1,38 +1,22 @@
 <!-- views/error404.ejs -->
 <!doctype html>
 <html>
-<head>
-    <title>Product Tracker</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <!--<link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-        body        { padding-top:80px; word-wrap:break-word; }
-    </style>
-</head>
-<body>
-<div class="container">
-
-    <div class="page-header text-center">
-        <h1><span class="fa fa-anchor"></span> Product Tracker </h1>
-    </div>
-
-    <div class="row">
-
-        <!-- LOCAL INFORMATION -->
-        <div class="col-sm-6">
-            <div class="well">
+    <head>
+        <title>Product Tracker</title>
+        <%- include partials/header.ejs %>
+        <link href="css/error.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+            <div class="page-header text-center">
+                <%- include partials/nav.ejs %>
+            </div>
+            <div class="error-box">
                 <h3><span class="fa fa-warning"></span> It seems that you are lost, there is nothing here.</h3>
-
-                    <img src="../images/lost.gif" alt="404 error gif">
-
-                    <p><a href="/profile">Go back to the main page</a></p>
-
+                <img src="../images/lost.gif" alt="404 error gif">
+                <p><a class="go-back" href="/home">Go back to the main page</a></p>
             </div>
         </div>
-
-    </div>
-
-</div>
-</body>
+        <%- include partials/footer.ejs %>
+    </body>
 </html>

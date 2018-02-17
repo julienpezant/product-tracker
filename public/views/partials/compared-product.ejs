@@ -1,0 +1,66 @@
+<% var iswatched = false %>
+<% for (wp in watched_products) {%>
+    <% if(watched_products[wp].sid === sourceprod.sid){ %>
+        <% iswatched = true %>
+        <% var current_threshold = watched_products[wp].threshold%>
+    <% } %>
+<% } %>
+
+<div class="main-product">
+    <div class="infobox_header_main_prod">
+        <h4>
+            <% if (iswatched){ %>
+                <i class="rotating fas fa-star"></i>
+            <% } %>
+            <%= sourceprod.title %>
+        </h4>
+        <div class="infobox_seller_name">Sold by <%= sourceprod.seller %></div>
+    </div>
+    <div class="infobox_wrapper">
+        <div class="infobox_image_main">
+            <img src="<%= sourceprod.iurl %>" alt="<%= sourceprod.ialt %>">
+        </div>
+        <div class="infobox_info">
+            <div class="infobox_text">
+                <div class="infobox_desc">
+                    <span class="bold">About : </span><%= sourceprod.desc %>
+                </div>
+                <div class="infobox_price">
+                    <span class="bold">Price : </span><%= sourceprod.price %> €
+                </div>
+                <% if (iswatched){ %>
+                    <div class="infobox_threshold">
+                        <span class="bold">Your threshold : </span><%= current_threshold %> €
+                    </div>
+                    <% if(parseFloat(current_threshold) >= parseFloat(sourceprod.price)){%>
+                        <div class="threshold-reached">This product's price is below the threshold you set for it. <a href="<%= sourceprod.link %>" target="_blank">Check the seller's website.</a></div>
+                    <% } %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    <div class="infobox_controls">
+
+        <% if(iswatched){ %>
+            <div class="infobox_details_button">
+                <a href="/watchedProduct?sid=<%= sourceprod.sid %>" class="infobox_link">Edit settings</a>
+            </div>
+            <div class="infobox_remove_button">
+                <a href="/removeWatchedProduct?sid=<%= sourceprod.sid %>" class="infobox_link">
+                    Remove from watchlist
+                </a>
+            </div>
+        <% } else { %>
+            <div class="infobox_add_button">
+                <a href="/addWatchedProd?sid=<%= sourceprod.sid %>" id="button_<%= sourceprod.sid %>" class="infobox_watchlist_add_button">
+                    Add to watchlist
+                </a>
+            </div>
+        <% } %>
+        <div class="infobox_source">
+            <a href="<%= sourceprod.link %>" target="_blank" class="infobox_link">Visit website</a>
+        </div>
+
+
+    </div>
+</div>

@@ -3,175 +3,24 @@
 <html>
     <head>
         <title>Product Tracker</title>
-        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
-        <link href="css/main.css" type="text/css" rel="stylesheet">
+        <%- include partials/header.ejs %>
         <link href="css/similarproducts.css" type="text/css" rel="stylesheet">
-        
-        <script src="/socket.io/socket.io.js"></script>
     </head>
     <body>
         <div class="container">
             <div class="page-header text-center">
-                <h1><span class="fa fa-anchor"></span> Product Tracker </h1>
                 <%- include partials/nav.ejs %>
             </div>
-            <div class="row">
-                <div class="col-sm-6">
+            <div >
+                <div>
                     <div class="well">
-                        <h3>Custom search</h3>
-                        <div class="main_product">
-                            <div class="infobox_header">
-                                <h4><%= sourceprod.title %></h4>
-                                <div class="infobox_seller_name">Sold by <%= sourceprod.seller %></div>
-                            </div>
-                            <div class="infobox_wrapper">
-                                <div class="infobox_image">
-                                    <img src="<%= sourceprod.iurl %>" alt="<%= sourceprod.ialt %>">
-                                </div>
-                                <div class="infobox_info">
-                                    <div class="infobox_text">
-                                        <div class="infobox_desc">
-                                            <%= sourceprod.desc %>
-                                        </div>
-                                        <div class="infobox_price">
-                                            Price : <%= sourceprod.price %> €
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="infobox_controls">
-                                <div class="infobox_source">
-                                    <a href="<%= sourceprod.link %>" class="infobox_link">See more on the seller's website</a>
-                                </div>
-                            </div>
-                        </div>
-                        <h4>The following products share some characteristics with the one above.</h4>
-                        <!--<ul class="similar_products">
-                            <% for (product in results) {%>
-                            <% product = results[product] %>
-                            <li class="searchRes" id="<%= product.sid %>">
-                                <div class="infobox_header">
-                                    <h5><%= product.title %></h5>
-                                    <div class="infobox_seller_name">Sold by <%= product.seller %></div>
-                                </div>
-                                <div class="infobox_wrapper">
-                                    <div class="infobox_image">
-                                        <img src="<%= product.iurl %>" alt="<%= product.ialt %>">
-                                    </div>
-                                    <div class="infobox_info">
-                                        <div class="infobox_text">
-                                            <div class="infobox_desc">
-                                                <%= product.desc %>
-                                            </div>
-                                            <div class="infobox_price">
-                                                Price : <%= product.price %> €
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="infobox_controls">
-                                    <div class="infobox_source">
-                                        <a href="<%= product.link %>" class="infobox_link">See more on the seller's website</a>
-                                    </div>
-                                    <% var iswatched = false %>
-                                    <% for (wp in watched_products) {%>
-                                    <% if(watched_products[wp].sid === product.sid){ %>
-                                    <% iswatched = true %>
-                                    <% } %>
-                                    <% } %>
-                                    <% if (iswatched) { %>
-                                    <div class="infobox_remove_button">
-                                        <a href="/removeWatchedProduct?sid=<%= product.sid %>" class="infobox_link">
-                                            Remove from watchlist
-                                        </a>
-                                    </div>
-                                    <% } else { %>
-                                    <div class="infobox_add_button">
-                                        <a href="/addWatchedProd?sid=<%= product.sid %>" id="button_<%= product.sid %>" class="infobox_watchlist_add_button">
-                                            Add to watchlist
-                                        </a>
-                                    </div>
-                                    <% } %>
-                                    <div class="infobox_similar_button">
-                                        <a href="/similarProducts?sid=<%= product.sid %>" class="infobox_link">See similar products</a>
-                                    </div>
-                                </div>
-                            </li>
-                            <% } %>
-                        </ul>-->
-                        <ul class="list-group">
-                            <% for (product in results) {%>
-                            <% product = results[product] %>
-                            <% var iswatched = false %>
-                            <% for (wp in watched_products) {%>
-                            <% if(watched_products[wp].sid === product.sid){ %>
-                            <% iswatched = true %>
-                            <% var current_threshold = watched_products[wp].threshold%>
-                            <% } %>
-                            <% } %>
-                            <% if (iswatched) { %>
-                            <li class="searchRes watched_product_container list-group-item" id="<%= product.sid %>">
-                                <% } else { %>
-                                <li class="searchRes not_watched_product_container list-group-item" id="<%= product.sid %>">
-                                    <% } %>
-                                    <div class="infobox_header">
-                                        <h4>
-                                        <% if (iswatched) { %>
-                                        <i class="fas fa-star"></i>
-                                        <% } %>
-                                        <%= product.title %>
-                                        </h4>
-                                        <div class="infobox_seller_name"> Sold by <%= product.seller %></div>
-                                    </div>
-                                    <div class="infobox_wrapper">
-                                        <div class="infobox_image">
-                                            <img src="<%= product.iurl %>" alt="<%= product.ialt %>">
-                                        </div>
-                                        <div class="infobox_info">
-                                            <div class="infobox_text">
-                                                <div class="infobox_desc">
-                                                    <span class="bold">About : </span><%= product.desc %>
-                                                </div>
-                                                <div class="infobox_price">
-                                                    <span class="bold">Price : </span><%= product.price %> €
-                                                </div>
-                                                <% if (iswatched) { %>
-                                                <div class="infobox_threshold">
-                                                    <span class="bold">Your threshold : </span><%= current_threshold %> €
-                                                </div>
-                                                <% } %>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="infobox_controls">
-                                        <% if (iswatched) { %>
-                                        <div class="infobox_details_button">
-                                            <a href="/watchedProduct?sid=<%= product.sid %>" class="infobox_link">Edit settings</a>
-                                        </div>
-                                        <div class="infobox_remove_button">
-                                            <a href="/removeWatchedProduct?sid=<%= product.sid %>" class="infobox_link">
-                                                Remove from watchlist
-                                            </a>
-                                        </div>
-                                        <% } else { %>
-                                        <div class="infobox_add_button">
-                                            <a href="/addWatchedProd?sid=<%= product.sid %>" id="button_<%= product.sid %>" class="infobox_watchlist_add_button">
-                                                Add to watchlist
-                                            </a>
-                                        </div>
-                                        <% } %>
-                                        <div class="infobox_similar_button">
-                                            <a href="/similarProducts?sid=<%= product.sid %>" class="infobox_link">See similar products</a>
-                                        </div>
-                                        <div class="infobox_source">
-                                            <a href="<%= product.link %>" class="infobox_link">See more on the seller's website</a>
-                                        </div>
-                                    </div>
-                                </li>
-                                <% } %>
-                            </ul>
+
+                        <h3>Products similar to «<i><%=sourceprod.title%></i>»</h3>
+
+                        <%- include partials/compared-product.ejs %>
+
+                        <%- include partials/product-list.ejs %>
+
                         </div>
                     </div>
                 </div>

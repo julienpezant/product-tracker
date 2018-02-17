@@ -42,43 +42,36 @@ module.exports = function(mongoose) {
 
 	function sendNotif(wprod,prod){
 
-		/*console.log("Sending mail");
+		var sender = 'producttrackermail@gmail.com';
+		var password = 'prodtrackunicaen2018';
 
-		// Generate test SMTP service account from ethereal.email
-		// Only needed if you don't have a real mail account for testing
-		nodemailer.createTestAccount((err) => {
+		var message = "Greetings " + wprod.umail + ", the price of the product \"" + prod.title + "\" (" + prod.price + " €) is below the threshold you set for it (" + wprod.threshold + " €). Check it out here : "+prod.link;
+		var html = "<h4>Greetings " + wprod.umail + ",</h4> <p>The price of the product <i>\"" + prod.title + "\"</i> (" + prod.price + " €) is below the threshold you set for it (" + wprod.threshold + " €).</p> <a href="+prod.link+">Check it out here</a>";
 
-			process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-			// create reusable transporter object using the default SMTP transport
-		    let transporter = nodemailer.createTransport({
-		        host: 'smtp.ethereal.email',
-		        port: 587,
-		        secure: false, // true for 465, false for other ports
-		        auth: {
-		            user: 'product-tracker', // generated ethereal user
-		            pass: 'whatever'  // generated ethereal password
-		        }
-		    });
+		var transporter = nodemailer.createTransport({
+		  service: 'gmail',
+		  auth: {
+		    user: sender,
+		    pass: password
+		  }
+		});
 
-			// setup email data with unicode symbols
-		    let mailOptions = {
-		        from: '"Product Tracker" <product.tracker@automailer.com>', // sender address
-		        to: wprod.umail, // list of receivers
-		        subject: 'Product Tracker - Notification', // Subject line
-		        text: 'This product\'s price is below the threshold you set for it. Check it out on "localhost:8080".', // plain text body
-		        html: '<p>This product\'s price is below the threshold you set for it. Check it out on "localhost:8080".</p>' // html body
-		    };
+		var mailOptions = {
+		  from: sender,
+		  to: wprod.umail,
+		  subject: 'Sending Email using Node.js',
+		  text: message,
+		  html: html
 
-		    // send mail with defined transport object
-		    transporter.sendMail(mailOptions, (error, info) => {
-		        if (error) {
-		            return console.log(error);
-		        }
-		        console.log('Message sent: %s', info.messageId);
-		        // Preview only available when sending through an Ethereal account
-		        console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-		    });
-	    });*/
+		};
+
+		transporter.sendMail(mailOptions, function(error, info){
+		  if (error) {
+		    console.log(error);
+		  } else {
+		    console.log('Email sent: ' + info.response);
+		  }
+		});
 
 	    console.log("A mail should be sent to " + wprod.umail + "because the price of product " + wprod.sid + " ("
 	    	+ prod.title + ") is below its associated threshold. (Price : " + prod.price + " <= Threshold : " + wprod.threshold + ")");

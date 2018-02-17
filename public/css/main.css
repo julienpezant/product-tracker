@@ -1,6 +1,9 @@
 body{
-	padding-top:80px;
 	word-wrap:break-word;
+}
+
+.container{
+	padding-top:80px;
 }
 
 .page-header{
@@ -11,9 +14,23 @@ h1{
 	color: #E88317;
 }
 
-.infobox_wrapper{
-	/*display:flex;
-	flex-wrap:wrap;*/
+h3{
+  text-align: center;
+  margin-bottom:30px;
+}
+
+hr{
+  margin-left:15%;
+  margin-right:15%;
+}
+
+.list-group{
+	flex-direction:row;
+	flex-wrap:wrap;
+}
+
+.infobox_header{
+  text-align:center;
 }
 
 .infobox_info, .infobox_image{
@@ -25,21 +42,31 @@ h1{
     height:150px;
     border:1px solid black;
     margin-right:15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto
 }
 
-.infobox_image img{
-    width:100%;
-    height:100%;
+.infobox_image img, .product-tracker-mini img{
+  width:100%;
+  height:100%;
+}
+
+.infobox_controls{
+  text-align:center;
 }
 
 .watched_product_container{
-	background: #FCF8E3;
-	/*background: #ffb454;*/
+	background-color: rgba(232, 131, 23, 0.1);
 	color:#986D3B;
 }
 
-.watched_product_container a{
-	/*color:#8A6D3B;*/
+.not_watched_product_container{
+	background: rgba(230, 230, 230, 0.6);
+}
+
+.fa-star{
+	color:#E88317;
 }
 
 .infobox_seller_name{
@@ -55,4 +82,58 @@ footer{
 	margin-top:40px;
 	margin-bottom:20px;
 	text-align:center;
+}
+
+.product-tracker-mini{
+	display:inline-block;
+	height:40px;
+	width:40px;
+}
+
+.threshold-not-reached a, .wrong{
+  color: red;
+}
+
+.threshold-reached a, .valid{
+  color:green;
+}
+
+.valid, .wrong{
+  margin-bottom:18px;
+}
+
+@-webkit-keyframes rotating /* Safari and Chrome */ {
+  from {
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes rotating {
+  from {
+    -ms-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -ms-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+.rotating {
+  -webkit-animation: rotating 4s linear infinite;
+  -moz-animation: rotating 4s linear infinite;
+  -ms-animation: rotating 4s linear infinite;
+  -o-animation: rotating 4s linear infinite;
+  animation: rotating 4s linear infinite;
 }

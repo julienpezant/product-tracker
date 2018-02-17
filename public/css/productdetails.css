@@ -1,0 +1,22 @@
+h5{
+	margin-top:30px;
+}
+
+.infobox_header{
+	text-align:left;
+}
+
+.infobox_image{  
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.threshold-reached, .threshold-not-reached{
+	margin-top:15px;
+}
+
+.details{
+	display: block;
+margin-left: auto;
+margin-right: auto;
+}

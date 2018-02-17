@@ -8,7 +8,7 @@ var port     = process.env.PORT || 8080;
 var mongoose = require('mongoose');
 
 var server = require('http').createServer(app);
-var io = require('socket.io')(server);
+/*var io = require('socket.io')(server);*/
 
 var passport = require('passport');
 var flash    = require('connect-flash');
@@ -33,7 +33,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 require('./config/passport')(passport); // pass passport for configuration
 
 // set up our express application
-app.use(morgan('dev')); // log every request to the console
+/*app.use(morgan('dev'));*/ // log every request to the console, used for dev
 app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser()); // get information from html forms
 

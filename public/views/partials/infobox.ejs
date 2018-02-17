@@ -1,0 +1,38 @@
+<li class="col-md-4 searchRes not_watched_product_container list-group-item" id="<%= product.sid %>">
+    <div class="infobox_header">
+        <h4>
+        <%= product.title %>
+        </h4>
+        <div class="infobox_seller_name"> Sold by <%= product.seller %></div>
+    </div>
+    <div class="infobox_wrapper">
+        <div class="infobox_image">
+            <img src="<%= product.iurl %>" alt="<%= product.ialt %>">
+        </div>
+        <hr>
+        <div class="infobox_info">
+            <div class="infobox_text">
+                <div class="infobox_desc">
+                    <span class="bold">About : </span><%= product.desc %>
+                </div>
+                <div class="infobox_price">
+                    <span class="bold">Price : </span><%= product.price %> €
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="infobox_controls">
+        <div class="infobox_add_button">
+            <a href="/addWatchedProd?sid=<%= product.sid %>" id="button_<%= product.sid %>" class="infobox_watchlist_add_button">
+                Add to watchlist
+            </a>
+        </div>
+        <div class="infobox_similar_button">
+            <a href="/similarProducts?sid=<%= product.sid %>" class="infobox_link">See similar products</a>
+        </div>
+        <div class="infobox_source">
+            <a href="<%= product.link %>" target="_blank" class="infobox_link">Visit website</a>
+        </div>
+    </div>
+</li>

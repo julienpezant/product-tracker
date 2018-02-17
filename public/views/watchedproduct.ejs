@@ -1,96 +1,104 @@
-<!-- views/profile.ejs -->
+<!-- views/home.ejs -->
 <!doctype html>
 <html>
-<head>
-    <title>Product Tracker</title>
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
-    <link href="css/main.css" type="text/css" rel="stylesheet">
-    <link href="css/productdetails.css" type="text/css" rel="stylesheet">
-    
-    <script src="/socket.io/socket.io.js"></script>
-
-</head>
-<body>
-<div class="container">
-
-    <div class="page-header text-center">
-        <h1><span class="fa fa-anchor"></span> Product Tracker </h1>
-        <%- include partials/nav.ejs %>
-    </div>
-
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="well">
-                <div class="infobox_header">
-                    <h4><%= product.title %></h4>
-                        <div class="infobox_seller_name">Sold by <%= product.seller %></div>
-                    </div>
-                    <div class="infobox_wrapper">
-                        <div class="infobox_image">
-                            <img src="<%= product.iurl %>" alt="<%= product.ialt %>">
+    <head>
+        <title>Product Tracker</title>
+        <%- include partials/header.ejs %>
+        <link href="css/productdetails.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+            <div class="page-header text-center">
+                <%- include partials/nav.ejs %>
+            </div>
+            <div class="row">
+                <div class="details col-sm-9">
+                    <div class="well">
+                        <div class="infobox_header">
+                            <h4><%= product.title %></h4>
+                            <div class="infobox_seller_name">Sold by <%= product.seller %></div>
                         </div>
-                        <div class="infobox_info">
-                            <div class="infobox_text">
-                                <div class="infobox_desc">
-                                    <%= product.desc %>
-                                </div>
-                                <div class="infobox_price">
-                                    Current price : <%= product.price %> €
-                                </div>
-                                <div class="infobox_current_threshold">
-                                    Your current price threshold for this product is <%= threshold %> €.
-                                </div>
-                                <% if(notifications === 'enabled'){ %>
-                                    <div class="infobox_notif_status">
+                        <div class="infobox_wrapper">
+                            <div class="infobox_image">
+                                <img src="<%= product.iurl %>" alt="<%= product.ialt %>">
+                            </div>
+                            <div class="infobox_info">
+                                <div class="infobox_text">
+                                    <div class="infobox_desc">
+                                        <span class="bold">About :</span> <%= product.desc %>
+                                    </div>
+                                    <div class="infobox_price">
+                                        <span class="bold">Current price :</span> <%= product.price %> €
+                                    </div>
+                                    <div class="infobox_current_threshold">
+                                       <span class="bold">Current threshold :</span> <%= threshold %> €.
+                                    </div>
+                                    <% var current_threshold = threshold%>
+                                    <%- include partials/threshold-reached.ejs %>
+                                    <% if(notifications === 'enabled'){ %>
+                                    <div class="infobox_notif_status valid">
                                         Notifications for this product are enabled.
                                     </div>
-                                <% } else { %>
-                                    <div class="infobox_notif_status">
+                                    <% } else { %>
+                                    <div class="infobox_notif_status wrong">
                                         Notifications for this product are disabled.
                                     </div>
-                                <% } %>
+                                    <% } %>
+                                </div>
+                                <hr>
+                                <form action="/editWatchedProduct?sid=<%= product.sid %>" method="post">
+                                    <h5>Your settings</h5>
+                                    <p>You may edit settings related to this product here.</p>
+                                    <% if(msg === "valid_num") {%>
+                                    <div class="valid">Settings successfully updated.</div>
+                                    <%} else if (msg === "invalid_num"){ %>
+                                    <div class="wrong">Invalid threshold value, please enter a valid number (30, 299.99, etc...)</div>
+                                    <% } %>
+                                    <div class="form-group">
+                                        <label for="threshold">Set your price threshold : </label>
+                                        <input class="form-control" id="threshold" type="text" name="threshold" value="<%= threshold %>">
+                                    </div>
+                                    <div class="form-group">
+                                        <% if(notifications === 'enabled'){ %>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="notifications" id="notif_on" value="enabled" checked="checked">
+                                            <label class="form-check-label" for="male">Notify me when the price is below the threshold</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="notifications" id="notif_off" value="disabled">
+                                            <label class="form-check-label" for="female">Do not</label>
+                                        </div>
+                                        <% } else { %>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="notifications" id="notif_on" value="enabled">
+                                            <label class="form-check-label" for="male">Notify me when the price is below the threshold</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="notifications" id="notif_off" value="disabled" checked="checked">
+                                            <label class="form-check-label" for="female">Do not</label>
+                                        </div>
+                                        <% } %>
+                                    </div>
+                                    <input type="submit" value="Save settings">
+                                </form>
                             </div>
-
-                            <form action="/editWatchedProduct?sid=<%= product.sid %>" method="post">
-
-                                <p>You may edit settings related to this product here.</p>
-                                <div class="error_msg"><%= msg %></div>
-                                <label for="threshold">Set your price threshold : </label>
-                                <input id="threshold" type="text" name="threshold" value="<%= threshold %>">
-
-                                <% if(notifications === 'enabled'){ %>
-                                    <label for="male">Notify me when the price is below the threshold</label>
-                                    <input type="radio" name="notifications" id="notif_on" value="enabled" checked="checked"><br>
-                                    <label for="female">Do not</label>
-                                    <input type="radio" name="notifications" id="notif_off" value="disabled"><br>
-                                <% } else { %>
-                                    <label for="male">Notify me when the price is below the threshold</label>
-                                    <input type="radio" name="notifications" id="notif_on" value="enabled"><br>
-                                    <label for="female">Do not</label>
-                                    <input type="radio" name="notifications" id="notif_off" value="disabled" checked="checked"><br>
-                                <% } %>
-
-                                <input type="submit" value="Save settings">
-                            </form>
-
+                        </div>
+                        <hr>
+                        <div class="infobox_controls">
+                            <div class="infobox_remove_button">
+                                <a href="/removeWatchedProduct?sid=<%= product.sid %>" class="infobox_link">Remove from watchlist</a>
+                            </div>
+                            <div class="infobox_similar_button">
+                                <a href="/similarProducts?sid=<%= product.sid %>" class="infobox_link">See similar products</a>
+                            </div>
+                            <div class="infobox_source">
+                                <a href="<%= product.link %>" class="infobox_link">Visit website</a>
+                            </div>
                         </div>
                     </div>
-                    <div class="infobox_controls">
-                        <div class="infobox_source">
-                            <a href="<%= product.link %>" class="infobox_link">See more on the seller's website</a>
-                        </div>
-                        <div class="infobox_similar_button">
-                            <a href="/similarProducts?sid=<%= product.sid %>" class="infobox_link">See similar products</a>
-                        </div>
-                        <div class="infobox_remove_button">
-                            <a href="/removeWatchedProduct?sid=<%= product.sid %>" class="infobox_link">Remove from watchlist</a>
-                        </div>
-                    </div>
+                </div>
             </div>
+            <%- include partials/footer.ejs %>
         </div>
-    </div>
-</div>
-</body>
+    </body>
 </html>
