@@ -12,7 +12,7 @@ module.exports = {
         var res = index.search(searchString,
             {
                 fields: {
-                    title : {boost : 10},
+                    title : {boost : 5},
                     desc : {boost : 3},
                     seller : {boost : 3}
                 },

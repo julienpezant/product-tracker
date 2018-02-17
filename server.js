@@ -8,7 +8,6 @@ var port     = process.env.PORT || 8080;
 var mongoose = require('mongoose');
 
 var server = require('http').createServer(app);
-/*var io = require('socket.io')(server);*/
 
 var passport = require('passport');
 var flash    = require('connect-flash');
